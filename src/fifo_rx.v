@@ -24,7 +24,8 @@ module fifo_rx #(
   assign full_o   = (count == DEPTH[$clog2(DEPTH):0]);
   assign empty_o  = (count == {($clog2(DEPTH)+1){1'b0}});
   reg [WIDTH-1:0] rd_data_r;
-  assign rd_data_o = rd_data_r;
+  //assign rd_data_o = rd_data_r;
+  assign rd_data_o = mem[rd_ptr];
   assign level_o   = count;
 
   always @(posedge clk or negedge resetn) begin

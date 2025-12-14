@@ -51,10 +51,15 @@ module qspi_fsm #(
     // QSPI pins
     output wire        sclk,
     output reg         cs_n,
-    inout  wire        io0,
-    inout  wire        io1,
-    inout  wire        io2,
-    inout  wire        io3
+    output reg  [3:0]  io_oe,
+    input  wire        io_in0,
+    input  wire        io_in1,
+    input  wire        io_in2,
+    input  wire        io_in3,
+    output  wire        io_out0,
+    output  wire        io_out1,
+    output  wire        io_out2,
+    output  wire        io_out3
 );
 
 // ------------------------------------------------------------
@@ -189,7 +194,7 @@ function [7:0] rev8;
     end
 endfunction
 
-wire [3:0] io_di = {io3, io2, io1, io0};
+wire [3:0] io_di = {io_in3, io_in2, io_in1, io_in0};
 reg  [3:0] out_bits, in_bits;
 
 always @* begin
@@ -214,10 +219,16 @@ always @* begin
     endcase
 end
 
-assign io0 = io_oe[0] ? out_bits[0] : 1'bz;
-assign io1 = io_oe[1] ? out_bits[1] : 1'bz;
-assign io2 = io_oe[2] ? out_bits[2] : 1'bz;
-assign io3 = io_oe[3] ? out_bits[3] : 1'bz;
+
+assign io_out0 =  out_bits[0];
+assign io_out1 =  out_bits[1];
+assign io_out2 =  out_bits[2];
+assign io_out3 =  out_bits[3];
+
+// assign io_out0 = io_oe[0] ? out_bits[0] : 1'bz;
+// assign io_out1 = io_oe[1] ? out_bits[1] : 1'bz;
+// assign io_out2 = io_oe[2] ? out_bits[2] : 1'bz;
+// assign io_out3 = io_oe[3] ? out_bits[3] : 1'bz;
 
 // ------------------------------------------------------------
 // State machine
@@ -538,7 +549,9 @@ always @* begin
                                 if (cmd_opcode == 8'h05) begin
                                     rx_data_fifo = {rev8(shreg_n[31:24]), rev8(shreg_n[23:16]), rev8(shreg_n[15:8]), rev8(shreg_n[7:0])};
                                 end else begin
+					$display("%t Pre assign  Flipping ShReg %x rx_data_fifo %x",$time, shreg_n,rx_data_fifo);
                                     rx_data_fifo = shreg_n;
+					$display("%t Post assign  Flipping ShReg %x rx_data_fifo %x",$time, shreg_n,rx_data_fifo);
                                 end
                             end
                             shreg_n = 32'b0;
@@ -606,6 +619,7 @@ always @* begin
                 cs_cnt_n = cs_cnt - 1'b1;
             else
                 state_n = IDLE;
+	$finish();
         end
 
         // Erase state: no data transfer; maintain CS low for one cycle

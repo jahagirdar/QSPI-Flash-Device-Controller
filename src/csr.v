@@ -419,7 +419,7 @@ module csr #(
         DMA_CFG_ADDR   : prdata = dma_cfg_reg;
         DMA_DST_ADDR   : prdata = dma_addr_reg;
         DMA_LEN_ADDR   : prdata = dma_len_reg;
-        FIFO_RX_ADDR   : prdata = fifo_rx_data_q;
+        FIFO_RX_ADDR   : prdata = fifo_rx_data_i;
         FIFO_STAT_ADDR : prdata = {22'd0, rx_full_i, tx_empty_i, rx_level_i, tx_level_i};
         ERR_STAT_ADDR  : prdata = err_stat_reg;
         default        : prdata = 32'h0;

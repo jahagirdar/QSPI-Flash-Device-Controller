@@ -68,7 +68,9 @@ module qspi_controller #(
   // QSPI pads
   output wire                     sclk,
   output wire                     cs_n,
-  inout  wire [3:0]               io,
+  inout  wire [3:0]               io_in,
+  output wire [3:0]               io_out,
+  output reg  [3:0]               io_oe,
 
   // Interrupt output
   output wire                     irq
@@ -104,7 +106,7 @@ module qspi_controller #(
         $display("[QSPI_CTL] fsm_done @%0t", $time);
       if (fsm_rx_wen_w && !fsm_rx_wen_q)
         $display("[QSPI_CTL] first RX: data=%08h level=%0d io1=%b @%0t",
-                 fsm_rx_data_w, fifo_rx_level_w, io[1], $time);
+                 fsm_rx_data_w, fifo_rx_level_w, io_in[1], $time);
       if (fifo_rx_level_w != fifo_rx_level_q)
         $display("[QSPI_CTL] fifo_rx_level %0d -> %0d @%0t",
                  fifo_rx_level_q, fifo_rx_level_w, $time);
@@ -609,10 +611,14 @@ module qspi_controller #(
     .rx_full       (fifo_rx_full_w),
     .sclk          (sclk_int),
     .cs_n          (cs_n_int),
-    .io0           (io[0]),
-    .io1           (io[1]),
-    .io2           (io[2]),
-    .io3           (io[3])
+    .io_in0           (io_in[0]),
+    .io_in1           (io_in[1]),
+    .io_in2           (io_in[2]),
+    .io_in3           (io_in[3]),
+    .io_out0           (io_out[0]),
+    .io_out1           (io_out[1]),
+    .io_out2           (io_out[2]),
+    .io_out3           (io_out[3])
   );
 
   // ---------------------------------------------------------
